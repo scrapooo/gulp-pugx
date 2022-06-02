@@ -1,0 +1,22 @@
+extends ./share/_layout
+link(href="./link-test.css?v={hash}")
+block content
+  h1= site.title
+  p Welcome to #{site.title}
+  ul
+    each item,index in news
+      li.wow.bounceInUp(data-wow-delay="#{index*0.2}")= item
+  div=l
+
+  style(lang="less").
+    h1 {
+      color: red;
+      .a {
+        color: red;
+      }
+    }
+
+  script.
+    const a = 1;
+    const b = a ?? 1;
+
