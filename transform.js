@@ -17,7 +17,7 @@ async function replaceAsync(str, reg, replacer) {
 }
 
 async function transformLess(code, options) {
-  const reg = /( *)(style\(lang="less"\)\.)((?:\n\1 +.+)+)\n(?:\1)?/g;
+  const reg = /( *)(style\(lang="less"\)\.)((?:\n(?:\1 +.+)?)+)\n(?:\1)?/g;
   async function replacer(matchText, empty, blockTag, lessCode) {
     const blank = /\n( +)/.exec(lessCode)?.[1] ?? '';
     const res = await less.render(lessCode, {
@@ -32,7 +32,7 @@ async function transformLess(code, options) {
 }
 
 function transformJs(code, options) {
-  const reg = /( *)(script\.)((?:\n\1 +.+)+)\n(?:\1)?/g;
+  const reg = /( *)(script\.)((?:\n(?:\1 +.+)?)+)\n(?:\1)?/g;
   function replacer(matchText, empty, blockTag, sourceCode) {
     const blank = /\n( +)/.exec(sourceCode)?.[1] ?? '';
     const res = babel.transformSync(sourceCode, {
