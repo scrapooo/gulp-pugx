@@ -1,5 +1,5 @@
 extends ./share/_layout
-link(href="./link-test.css?v=487f7b22f6")
+link(href="./link-test.css?v=902311db9b")
 block content
   h1= site.title
   p Welcome to #{site.title}
@@ -15,7 +15,6 @@ block content
     h1 .a {
       color: red;
     }
-
   script.
     "use strict";
     

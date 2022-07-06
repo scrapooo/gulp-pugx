@@ -3,6 +3,7 @@ const babel = require('@babel/core');
 const path = require('path');
 const fs = require('fs');
 const MD5 = require('crypto-js/md5');
+const terser = require('terser');
 
 async function replaceAsync(str, reg, replacer) {
   const matches = [...str.matchAll(reg)];
@@ -17,34 +18,38 @@ async function replaceAsync(str, reg, replacer) {
 }
 
 async function transformLess(code, options) {
-  const reg = /( *)(style\(lang="less"\)\.)((?:\n(?:\1 +.+)?)+)\n(?:\1)?/g;
-  async function replacer(matchText, empty, blockTag, lessCode) {
-    const blank = /\n( +)/.exec(lessCode)?.[1] ?? '';
+  const reg =
+    /( *)(style\(lang="less"\)\.)((?:(\r?\n)(?:\1 +.+)?)+)\r?\n(?:\1 +)?/g;
+  async function replacer(matchText, empty, blockTag, lessCode, crlf) {
+    const blank = /\r?\n( +)/.exec(lessCode)?.[1] ?? '';
     const res = await less.render(lessCode, {
       ...options.less,
       paths: [options.root],
     });
     const css = res.css.trim().replace(/^( *)/gm, `${blank}$1`);
-    return empty + `${blockTag}\n${css}\n`;
+    return empty + `${blockTag}${crlf}${css}${crlf}`;
   }
 
   return replaceAsync(code, reg, replacer);
 }
 
 function transformJs(code, options) {
-  const reg = /( *)(script\.)((?:\n(?:\1 +.+)?)+)\n(?:\1)?/g;
-  function replacer(matchText, empty, blockTag, sourceCode) {
-    const blank = /\n( +)/.exec(sourceCode)?.[1] ?? '';
+  const reg = /( *)(script\.)((?:(\r?\n)(?:\1 +.+)?)+)\r?\n(?:\1)?/g;
+  async function replacer(matchText, empty, blockTag, sourceCode, crlf) {
+    const blank = /\r?\n( +)/.exec(sourceCode)?.[1] ?? '';
     const res = babel.transformSync(sourceCode, {
       presets: ['@babel/preset-env'],
       ...options.babel,
       root: options.root,
     });
-    const jsCode = res.code.trim().replace(/^( *)/gm, `${blank}$1`);
-    return empty + `${blockTag}\n${jsCode}\n`;
+    let jsCode = res.code;
+    if (options.js?.compress) {
+      jsCode = (await terser.minify(jsCode)).code;
+    }
+    jsCode = jsCode.trim().replace(/^( *)/gm, `${blank}$1`);
+    return empty + `${blockTag}${crlf}${jsCode}${crlf}`;
   }
-
-  return code.replace(reg, replacer);
+  return replaceAsync(code, reg, replacer);
 }
 
 function transformUrlHash(code, options) {
