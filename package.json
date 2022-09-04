@@ -6,12 +6,13 @@
   "scripts": {
     "test": "mocha"
   },
-  "types": "typings/index.d.ts",
+  "types": "index.d.ts",
   "author": "scroop",
   "license": "MIT",
   "dependencies": {
     "@babel/core": "7.18.2",
     "@babel/preset-env": "7.18.2",
+    "@types/less": "3.0.3",
     "crypto-js": "4.1.1",
     "less": "4.1.2",
     "readable-stream": "3.6.0",

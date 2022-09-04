@@ -1,16 +1,5 @@
-/// <reference path="globals/less/index.d.ts" />
-/// <reference path="modules/babel-core/index.d.ts" />
-
 import { TransformOptions } from 'babel-core';
 import { Transform } from 'readable-stream';
-
-interface LessOptions extends Less.Options {
-  paths?: string[] | undefined;
-  rootpath?: string;
-  javascriptEnabled?: boolean;
-  globalVars?: any;
-  modifyVars?: any;
-}
 
 interface PugxOptions {
   /**
@@ -20,7 +9,7 @@ interface PugxOptions {
   /**
    * less options 参考less官方文档配置 https://lesscss.org/usage/#less-options
    */
-  less: LessOptions;
+  less: Less.Options;
   /**
    * babel options // 参考babel官方文档配置
    */
