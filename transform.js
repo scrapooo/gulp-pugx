@@ -24,6 +24,7 @@ async function transformLess(code, options) {
     const blank = /\r?\n( +)/.exec(lessCode)?.[1] ?? '';
     const res = await less.render(lessCode, {
       ...options.less,
+      compress: options.compress,
       paths: [options.root],
     });
     const css = res.css.trim().replace(/^( *)/gm, `${blank}$1`);
@@ -43,7 +44,7 @@ function transformJs(code, options) {
       root: options.root,
     });
     let jsCode = res.code;
-    if (options.js?.compress) {
+    if (options.compress) {
       jsCode = (await terser.minify(jsCode)).code;
     }
     jsCode = jsCode.trim().replace(/^( *)/gm, `${blank}$1`);
